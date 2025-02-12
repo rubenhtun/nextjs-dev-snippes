@@ -1,10 +1,10 @@
-// Server Component
 "use server";
 
 import { prisma } from "@/libs/prisma";
 import { redirect } from "next/navigation";
 
-export async function handleRegister(formData: FormData) {
+export default async function editUser(formData: any) {
+  const userId = formData.get("userId") as String;
   const firstName = formData.get("firstName") as string;
   const lastName = formData.get("lastName") as string;
   const userName = formData.get("username") as string;
@@ -12,8 +12,8 @@ export async function handleRegister(formData: FormData) {
   const phone = formData.get("phone") as string;
   const dateOfBirth = formData.get("dateOfBirth") as string;
 
-  // Store user in the database
-  await prisma.user.create({
+  await prisma.user.update({
+    where: { id: Number(userId) },
     data: {
       firstName,
       lastName,
@@ -24,6 +24,5 @@ export async function handleRegister(formData: FormData) {
     },
   });
 
-  // Redirect after successful registration
   redirect("/users");
 }
