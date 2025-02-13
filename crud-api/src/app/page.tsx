@@ -1,116 +1,92 @@
-// Server-side component for registration form
-import { User, Mail, Phone, Calendar } from "lucide-react";
-import { handleRegister } from "./action";
+"use client";
 
-export default async function Home() {
+import { useEffect, useState } from "react";
+import { Edit2, Trash2 } from "lucide-react";
+
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  isbn: string;
+  category: string;
+  quantity: number;
+  status: string;
+}
+
+export default function Home() {
+  const [books, setBooks] = useState<Book[]>([]);
+
+  useEffect(() => {
+    getBooks();
+  }, []);
+
+  const getBooks = async () => {
+    try {
+      const response = await fetch("api/books");
+      const data = await response.json();
+      setBooks(data.booksList);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Status Color Function
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "In Stock":
+        return "text-green-600";
+      case "Low Stock":
+        return "text-yellow-600";
+      case "Out of Stock":
+        return "text-red-600";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Create an Account
-          </h2>
-          <p className="text-gray-600 mt-1">
-            Enter your information to register
-          </p>
-        </div>
-
-        <form action={handleRegister} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                placeholder="John"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                placeholder="Doe"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                name="username"
-                required
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                placeholder="johndoe.dev"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <input
-                type="email"
-                name="email"
-                required
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                placeholder="johndoe.dev@gmail.com"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Phone Number
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <input
-                type="tel"
-                name="phone"
-                required
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                placeholder="+66 432 455 330"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Date of Birth
-            </label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              <input
-                type="date"
-                name="dateOfBirth"
-                required
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 mt-6"
-          >
-            Register
-          </button>
-        </form>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Book Inventory</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-4 py-2 text-left">Title</th>
+              <th className="border px-4 py-2 text-left">Author</th>
+              <th className="border px-4 py-2 text-left">ISBN</th>
+              <th className="border px-4 py-2 text-left">Category</th>
+              <th className="border px-4 py-2 text-left">Quantity</th>
+              <th className="border px-4 py-2 text-left">Status</th>
+              <th className="border px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books.map((book) => (
+              <tr key={book.id} className="hover:bg-gray-50">
+                <td className="border px-4 py-2">{book.title}</td>
+                <td className="border px-4 py-2">{book.author}</td>
+                <td className="border px-4 py-2">{book.isbn}</td>
+                <td className="border px-4 py-2">{book.category}</td>
+                <td className="border px-4 py-2">{book.quantity}</td>
+                <td
+                  className={`border px-4 py-2 ${getStatusColor(book.status)}`}
+                >
+                  {book.status}
+                </td>
+                <td className="border px-4 py-2">
+                  <div className="flex gap-2">
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <Edit2 className="h-4 w-4" />
+                    </button>
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
