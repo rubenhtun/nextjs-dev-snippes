@@ -1,7 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { Book, BookOpen, QrCode, Users, Package, Activity } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Book,
+  BookOpen,
+  QrCode,
+  Users,
+  Package,
+  Activity,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export interface Book {
@@ -54,7 +63,9 @@ export default function AddBook() {
 
       const data = await response.json();
       setMessge(data.message);
-      router.push("/books");
+      setTimeout(() => {
+        router.push("/books");
+      }, 1000);
 
       // Reset default data after successful submission
       setBookData(defaultData);
@@ -67,7 +78,28 @@ export default function AddBook() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-teal-100 p-6">
       <div className="max-w-5xl mx-auto">
-        <p>{message}</p>
+        {/* Success/Failure Message */}
+        {message && (
+          <div
+            className={`absolute top-5 right-5 p-4 rounded-full shadow-lg text-white ${
+              message.includes("Failed") ? "bg-red-500" : "bg-teal-500"
+            } animate-popup flex items-center`}
+          >
+            {/* Success Icon */}
+            {!message.includes("Failed") && (
+              <CheckCircle className="w-5 h-5 text-white mr-2" />
+            )}
+
+            {/* Error Icon */}
+            {message.includes("Failed") && (
+              <XCircle className="w-5 h-5 text-white mr-2" />
+            )}
+
+            {/* Message Text */}
+            {message}
+          </div>
+        )}
+
         <div className="grid md:grid-cols-[1fr,2fr] gap-8 bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Left Panel */}
           <div className="bg-teal-500 p-8 text-white flex flex-col justify-between">

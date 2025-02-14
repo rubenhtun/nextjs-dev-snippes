@@ -26,3 +26,11 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+// Delete request method
+export async function DELETE(req: NextRequest) {
+  // This program will not use query params
+  const bookId = await req.json();
+  await prisma.book.delete({ where: { id: Number(bookId) } });
+  return NextResponse.json(null, { status: 200 });
+}

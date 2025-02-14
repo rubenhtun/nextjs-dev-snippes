@@ -35,6 +35,24 @@ export default function Books() {
     }
   };
 
+  const hanldeDeleteBook = async (bookId: number) => {
+    try {
+      // This program will not use query params
+      await fetch("/api/books", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookId),
+      });
+      getBooks();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  if (!books) return null;
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-teal-700 mb-6">Book Inventory</h1>
@@ -69,7 +87,12 @@ export default function Books() {
                     <button className="p-2 bg-teal-100 hover:bg-teal-200 rounded-lg transition">
                       <Edit2 className="h-5 w-5 text-teal-700" />
                     </button>
-                    <button className="p-2 bg-rose-100 hover:bg-rose-200 rounded-lg transition">
+                    <button
+                      className="p-2 bg-rose-100 hover:bg-rose-200 rounded-lg transition"
+                      onClick={() => {
+                        hanldeDeleteBook(book.id);
+                      }}
+                    >
                       <Trash2 className="h-5 w-5 text-rose-700" />
                     </button>
                   </div>
