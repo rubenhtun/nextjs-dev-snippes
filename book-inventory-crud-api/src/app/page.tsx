@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   Book,
   Edit2,
@@ -15,7 +15,6 @@ import {
   Package,
   Activity,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export interface Book {
   id: number;
@@ -28,10 +27,11 @@ export interface Book {
 }
 
 export default function BookInventory() {
-  const router = useRouter();
   const [books, setBooks] = useState<Book[]>([]);
   const [search, setSearch] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editBookInfo, setEditBookInfo] = useState<Book>();
 
   useEffect(() => {
     getBooks();
@@ -48,7 +48,53 @@ export default function BookInventory() {
     }
   };
 
-  // Delete books in server
+  // **************** Adding Book **************** //
+  // Handle Edit Form Value Change Function
+  const handleEditValueChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditBookInfo((prev: any) => ({
+      ...prev,
+      [name]: name === "quantity" ? Number(value) : value,
+    }));
+  };
+
+  // To Edit Book
+  const toEditBook = async (bookId: number) => {
+    setIsEditModalOpen(true);
+    try {
+      const response = await fetch(`api/books?id=${bookId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const getBookInfo = await response.json();
+      setEditBookInfo(getBookInfo);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Edit book in server
+  const handleEditBook = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!editBookInfo) return;
+
+    try {
+      await fetch("api/books", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editBookInfo),
+      });
+      setIsEditModalOpen(false);
+      getBooks(); // Refresh the book list
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // Delete book in server
   const handleDeleteBook = async (bookId: number) => {
     try {
       await fetch("/api/books", {
@@ -120,7 +166,7 @@ export default function BookInventory() {
       // Reset default data after successful submission
       setBookData(defaultData);
       // Close the modal after submission
-      setIsModalOpen(false);
+      setIsAddModalOpen(false);
       // Show success message
       setMessage(data.message);
       setTimeout(() => {
@@ -150,7 +196,7 @@ export default function BookInventory() {
           </div>
           <button
             className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-teal-700 transition"
-            onClick={() => setIsModalOpen(true)} // Open modal when click
+            onClick={() => setIsAddModalOpen(true)} // Open modal when click
           >
             <PlusCircle className="h-5 w-5" /> Add Book
           </button>
@@ -190,7 +236,10 @@ export default function BookInventory() {
                 </td>
                 <td className="border px-6 py-4">
                   <div className="flex gap-3">
-                    <button className="p-2 bg-teal-100 hover:bg-teal-200 rounded-lg transition">
+                    <button
+                      className="p-2 bg-teal-100 hover:bg-teal-200 rounded-lg transition"
+                      onClick={() => toEditBook(book.id)}
+                    >
                       <Edit2 className="h-5 w-5 text-teal-700" />
                     </button>
                     <button
@@ -208,11 +257,11 @@ export default function BookInventory() {
       </div>
 
       {/* Modal for adding book */}
-      {isModalOpen && (
+      {isAddModalOpen && (
         <div
           className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50"
           // Close modal when clicking outside
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => setIsAddModalOpen(false)}
         >
           <div
             className="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden"
@@ -385,6 +434,153 @@ export default function BookInventory() {
                   </div>
                 </form>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Editing book */}
+      {isEditModalOpen && editBookInfo && (
+        <div
+          className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-6 z-50"
+          // Close modal when clicking outside
+          onClick={() => setIsEditModalOpen(false)}
+        >
+          <div
+            className="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+            // Prevent modal from closing when clicking inside
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Content */}
+            <div className="p-8">
+              <form onSubmit={handleEditBook} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Title */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Book Title
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                      placeholder="Enter book title"
+                      value={editBookInfo.title}
+                      onChange={handleEditValueChange}
+                    />
+                  </div>
+
+                  {/* Author */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      name="author"
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                      placeholder="Author name"
+                      value={editBookInfo.author}
+                      onChange={handleEditValueChange}
+                    />
+                  </div>
+
+                  {/* ISBN */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      ISBN
+                    </label>
+                    <input
+                      type="text"
+                      name="isbn"
+                      required
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                      placeholder="Enter ISBN"
+                      value={editBookInfo.isbn}
+                      onChange={handleEditValueChange}
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Category
+                    </label>
+                    <select
+                      name="category"
+                      required
+                      value={editBookInfo.category}
+                      onChange={handleEditValueChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                    >
+                      <option value="">Select category</option>
+                      <option value="Fiction">Fiction</option>
+                      <option value="Non-Fiction">Non-Fiction</option>
+                      <option value="Science">Science</option>
+                      <option value="History">History</option>
+                      <option value="Self-Help">Self-Help</option>
+                    </select>
+                  </div>
+
+                  {/* Status with Icon */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="status"
+                        required
+                        value={editBookInfo.status}
+                        onChange={handleEditValueChange}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors appearance-none"
+                      >
+                        <option value="">Select status</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                      </select>
+                      <Activity className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* Quantity with Icon */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Quantity
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        name="quantity"
+                        min="0"
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                        placeholder="Enter quantity"
+                        value={
+                          editBookInfo.quantity === 0
+                            ? ""
+                            : editBookInfo.quantity
+                        }
+                        onChange={handleEditValueChange}
+                      />
+                      <Package className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full bg-teal-500 text-white py-3 px-6 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    <Book className="w-5 h-5" />
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
