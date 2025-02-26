@@ -124,7 +124,7 @@ export default function BookInventory() {
     book.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  // **************** Adding Book **************** //
+  // **************** Editing Book **************** //
   const defaultData = {
     title: "",
     author: "",
