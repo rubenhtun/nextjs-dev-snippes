@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,8 @@ import {
   CssBaseline,
   ThemeProvider,
   createTheme,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 
 // Icons
@@ -34,6 +36,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import Link from "next/link";
 
 // Create a theme
 const theme = createTheme({
@@ -76,12 +79,31 @@ const theme = createTheme({
 
 const drawerWidth = 240;
 
-export default function Dashboard() {
+export default function Dashboard({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  const handleAvatarClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 600) {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const drawer = (
     <Box sx={{ p: 2 }}>
@@ -100,31 +122,46 @@ export default function Dashboard() {
       </Box>
       <Divider sx={{ mb: 2 }} />
       <List>
-        <ListItem button selected={true}>
+        <ListItem
+          button
+          component={Link}
+          href="/online-course-management"
+          key="dashboard"
+        >
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItem>
-        <ListItem button>
+        <ListItem
+          button
+          component={Link}
+          href="/available-courses"
+          key="available-courses"
+        >
           <ListItemIcon>
             <VideoLibraryIcon />
           </ListItemIcon>
-          <ListItemText primary="My Courses" />
+          <ListItemText primary="Available Courses" />
         </ListItem>
-        <ListItem button>
+        <ListItem
+          button
+          component={Link}
+          href="/course-categories"
+          key="categories"
+        >
           <ListItemIcon>
             <CategoryIcon />
           </ListItemIcon>
           <ListItemText primary="Course Categories" />
         </ListItem>
-        <ListItem button>
+        <ListItem button component={Link} href="/resources" key="resources">
           <ListItemIcon>
             <BookIcon />
           </ListItemIcon>
           <ListItemText primary="Resources" />
         </ListItem>
-        <ListItem button>
+        <ListItem button key="community">
           <ListItemIcon>
             <PeopleIcon />
           </ListItemIcon>
@@ -133,19 +170,19 @@ export default function Dashboard() {
       </List>
       <Divider sx={{ my: 2 }} />
       <List>
-        <ListItem button>
+        <ListItem button key="profile">
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </ListItem>
-        <ListItem button>
+        <ListItem button key="settings">
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="Settings" />
         </ListItem>
-        <ListItem button>
+        <ListItem button key="logout">
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>
@@ -176,6 +213,7 @@ export default function Dashboard() {
               edge="start"
               onClick={handleDrawerToggle}
               sx={{ mr: 2, display: { sm: "none" } }}
+              aria-label="Toggle drawer"
             >
               <MenuIcon />
             </IconButton>
@@ -215,14 +253,25 @@ export default function Dashboard() {
             />
 
             <Box sx={{ ml: "auto", display: "flex" }}>
-              <IconButton>
+              <IconButton aria-label="Notifications">
                 <NotificationsIcon />
               </IconButton>
               <Avatar
                 sx={{ ml: 1, bgcolor: "primary.main", cursor: "pointer" }}
+                onClick={handleAvatarClick}
+                aria-label="User profile"
               >
                 <PersonIcon />
               </Avatar>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+                <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+                <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+              </Menu>
             </Box>
           </Toolbar>
         </AppBar>
@@ -237,7 +286,7 @@ export default function Dashboard() {
             open={mobileOpen}
             onClose={handleDrawerToggle}
             ModalProps={{
-              keepMounted: true, // Better mobile performance
+              keepMounted: true,
             }}
             sx={{
               display: { xs: "block", sm: "none" },
@@ -259,6 +308,19 @@ export default function Dashboard() {
           >
             {drawer}
           </Drawer>
+        </Box>
+
+        {/* Main content */}
+        <Box
+          component="main"
+          sx={{
+            p: 3,
+            width: "100%",
+          }}
+        >
+          <Toolbar />
+          {/* Main content goes here */}
+          {children}
         </Box>
       </Box>
     </ThemeProvider>
