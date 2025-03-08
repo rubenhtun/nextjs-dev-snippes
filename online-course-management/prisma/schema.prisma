@@ -1,0 +1,44 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Courses {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int?     @default(0)
+  isPublished Boolean? @default(false)
+  categories  CourseCategoriesCourses[]
+  resources   CourseResources[]
+}
+
+model CourseCategories {
+  id          Int      @id @default(autoincrement())
+  name        String
+  courses     CourseCategoriesCourses[]
+}
+
+model CourseCategoriesCourses {
+  id              Int      @id @default(autoincrement())
+  courseId        Int
+  course          Courses  @relation(fields: [courseId], references: [id])
+  courseCategoryId Int
+  courseCategory  CourseCategories @relation(fields: [courseCategoryId], references: [id])
+}
+
+model CourseResources {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int?     @default(0)
+  isAvailable Boolean? @default(true)
+  courseId    Int
+  course      Courses  @relation(fields: [courseId], references: [id])
+}
