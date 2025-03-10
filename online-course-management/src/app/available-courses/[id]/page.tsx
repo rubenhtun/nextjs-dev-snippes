@@ -18,7 +18,7 @@ interface Props {
   };
 }
 
-export default async function AddNewCourse({ params }: Props) {
+export default async function UpdateCourse({ params }: Props) {
   const { id } = params;
   const courseInfo = await prisma.courses.findUnique({
     where: { id: Number(id) },
