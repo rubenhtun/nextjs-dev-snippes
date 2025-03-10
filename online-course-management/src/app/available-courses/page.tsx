@@ -39,83 +39,89 @@ export default async function AvailableCourses() {
           gap: 2,
           marginTop: "20px",
           padding: 3,
+          cursor: "pointer",
         }}
       >
         <Grid container spacing={3}>
           {courses.map((course) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={course.id}>
-              <Paper
-                sx={{
-                  padding: 2,
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  backgroundColor: "#f9f9f9",
-                  "&:hover": {
-                    boxShadow: 6,
-                    backgroundColor: "#e3f2fd",
-                    transition: "all 0.3s",
-                  },
-                }}
+              <Link
+                href={`available-courses/${course.id}`}
+                style={{ textDecoration: "none" }}
               >
-                <Box
+                <Paper
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                    height: "150px",
+                    padding: 2,
                     borderRadius: 2,
-                    backgroundColor: "#6a1b9a",
-                    color: "#fff",
-                    marginBottom: 2,
+                    boxShadow: 3,
+                    backgroundColor: "#f9f9f9",
+                    "&:hover": {
+                      boxShadow: 6,
+                      backgroundColor: "#e3f2fd",
+                      transition: "all 0.3s",
+                    },
                   }}
                 >
-                  <SchoolIcon sx={{ fontSize: 80 }} />
-                </Box>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#3f51b5",
-                    textAlign: "center",
-                  }}
-                >
-                  {course.name}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    marginY: 1,
-                    color: "text.secondary",
-                    textAlign: "center",
-                  }}
-                >
-                  {course.description}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ marginY: 1, color: "#6a1b9a", textAlign: "center" }}
-                >
-                  Price: ${course.price}
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 2,
-                  }}
-                >
-                  <Chip
-                    label={course.isPublished ? "Published" : "Not Published"}
-                    variant="outlined"
+                  <Box
                     sx={{
-                      fontWeight: "medium",
-                      borderColor: course.isPublished ? "#4caf50" : "#f44336",
-                      color: course.isPublished ? "#4caf50" : "#f44336",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      height: "150px",
+                      borderRadius: 2,
+                      backgroundColor: "#6a1b9a",
+                      color: "#fff",
+                      marginBottom: 2,
                     }}
-                  />
-                </Box>
-              </Paper>
+                  >
+                    <SchoolIcon sx={{ fontSize: 80 }} />
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#3f51b5",
+                      textAlign: "center",
+                    }}
+                  >
+                    {course.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      marginY: 1,
+                      color: "text.secondary",
+                      textAlign: "center",
+                    }}
+                  >
+                    {course.description}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ marginY: 1, color: "#6a1b9a", textAlign: "center" }}
+                  >
+                    Price: ${course.price}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginTop: 2,
+                    }}
+                  >
+                    <Chip
+                      label={course.isPublished ? "Published" : "Not Published"}
+                      variant="outlined"
+                      sx={{
+                        fontWeight: "medium",
+                        borderColor: course.isPublished ? "#4caf50" : "#f44336",
+                        color: course.isPublished ? "#4caf50" : "#f44336",
+                      }}
+                    />
+                  </Box>
+                </Paper>
+              </Link>
             </Grid>
           ))}
         </Grid>

@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Box,
   TextField,
@@ -9,14 +8,36 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import Layout from "@/app/components/Layout";
-import { addNewCourse } from "../action";
+import { prisma } from "@/libs/prisma";
+import { updateCourse } from "../action";
 
-export default function AddNewCourse() {
+interface Props {
+  params: {
+    id: string;
+  };
+}
+
+export default async function AddNewCourse({ params }: Props) {
+  const { id } = params;
+  const courseInfo = await prisma.courses.findUnique({
+    where: { id: Number(id) },
+  });
+
+  if (!courseInfo) {
+    return (
+      <Layout>
+        <Typography variant="h6" sx={{ textAlign: "center", mt: 5 }}>
+          Course not found.
+        </Typography>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Box
-        component={"form"}
-        action={addNewCourse}
+        component="form"
+        action={updateCourse}
         sx={{
           width: "100%",
           maxWidth: 600,
@@ -27,17 +48,20 @@ export default function AddNewCourse() {
           borderRadius: 2,
         }}
       >
+        <input type="hidden" name="courseId" value={courseInfo.id} />
+
         <Typography
           variant="h5"
           sx={{ color: "#6a1b9a", mb: 3, textAlign: "center" }}
         >
-          Add New Course
+          Update Course Info
         </Typography>
 
         {/* Course Title */}
         <TextField
           label="Course Title"
           name="courseTitle"
+          defaultValue={courseInfo.name}
           variant="outlined"
           fullWidth
           sx={{ mb: 3 }}
@@ -46,7 +70,8 @@ export default function AddNewCourse() {
         {/* Course Description */}
         <TextField
           label="Course Description"
-          name="couseDescription"
+          name="courseDescription"
+          defaultValue={courseInfo.description}
           variant="outlined"
           multiline
           rows={4}
@@ -58,6 +83,7 @@ export default function AddNewCourse() {
         <TextField
           label="Price"
           name="price"
+          defaultValue={courseInfo.price}
           variant="outlined"
           type="number"
           fullWidth
@@ -66,7 +92,12 @@ export default function AddNewCourse() {
 
         {/* Is Published */}
         <FormControlLabel
-          control={<Checkbox defaultChecked name="isPublished" />}
+          control={
+            <Checkbox
+              defaultChecked={courseInfo.isPublished ?? false}
+              name="isPublished"
+            />
+          }
           label="Is Published"
           sx={{ mb: 3 }}
         />
@@ -82,7 +113,7 @@ export default function AddNewCourse() {
           }}
           type="submit"
         >
-          Add Course
+          Update Course
         </Button>
       </Box>
     </Layout>
