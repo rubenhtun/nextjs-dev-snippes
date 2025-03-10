@@ -3,6 +3,7 @@
 import { prisma } from "@/libs/prisma";
 import { redirect } from "next/navigation";
 
+// Adding new course
 export async function addNewCourse(formData: FormData) {
   const courseTitle = formData.get("courseTitle") as string;
   const courseDescription = formData.get("couseDescription") as string;
@@ -22,6 +23,7 @@ export async function addNewCourse(formData: FormData) {
   redirect("/available-courses");
 }
 
+// Update course
 export async function updateCourse(formData: FormData) {
   const courseId = formData.get("courseId") as string;
   const courseTitle = formData.get("courseTitle") as string;
@@ -42,5 +44,15 @@ export async function updateCourse(formData: FormData) {
   });
 
   // Redirect after successful update
+  redirect("/available-courses");
+}
+
+// Delete course
+export async function deleteCourse(formData: FormData) {
+  const courseId = formData.get("courseId") as string;
+
+  await prisma.courses.delete({ where: { id: Number(courseId) } });
+
+  // After deletion, refresh page again
   redirect("/available-courses");
 }

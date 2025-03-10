@@ -1,8 +1,18 @@
 import { prisma } from "@/libs/prisma";
 import Layout from "../components/Layout";
-import { Box, Button, Chip, Grid, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Grid,
+  IconButton,
+  Paper,
+  Typography,
+} from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import Link from "next/link";
+import { Delete } from "@mui/icons-material";
+import { deleteCourse } from "./action";
 
 export default async function AvailableCourses() {
   const courses = await prisma.courses.findMany();
@@ -44,23 +54,40 @@ export default async function AvailableCourses() {
       >
         <Grid container spacing={3}>
           {courses.map((course) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={course.id}>
-              <Link
-                href={`available-courses/${course.id}`}
-                style={{ textDecoration: "none" }}
+            <Grid item xs={12} sm={6} lg={4} key={course.id}>
+              <Paper
+                sx={{
+                  padding: 2,
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  backgroundColor: "#f9f9f9",
+                  "&:hover": {
+                    boxShadow: 6,
+                    backgroundColor: "#e3f2fd",
+                    transition: "all 0.3s",
+                  },
+                  position: "relative",
+                }}
               >
-                <Paper
-                  sx={{
-                    padding: 2,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    backgroundColor: "#f9f9f9",
-                    "&:hover": {
-                      boxShadow: 6,
-                      backgroundColor: "#e3f2fd",
-                      transition: "all 0.3s",
-                    },
-                  }}
+                {/* Three dots icon */}
+                <Box component={"form"} action={deleteCourse}>
+                  <input type="hidden" name="courseId" value={course.id} />
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      right: 8,
+                      color: "#f1f1f1",
+                    }}
+                    type="submit"
+                  >
+                    <Delete />
+                  </IconButton>
+                </Box>
+
+                <Link
+                  href={`available-courses/${course.id}`}
+                  style={{ textDecoration: "none" }}
                 >
                   <Box
                     sx={{
@@ -101,7 +128,7 @@ export default async function AvailableCourses() {
                     variant="body2"
                     sx={{ marginY: 1, color: "#6a1b9a", textAlign: "center" }}
                   >
-                    Price: ${course.price}
+                    Price: {course.price} Kyats
                   </Typography>
                   <Box
                     sx={{
@@ -120,8 +147,8 @@ export default async function AvailableCourses() {
                       }}
                     />
                   </Box>
-                </Paper>
-              </Link>
+                </Link>
+              </Paper>
             </Grid>
           ))}
         </Grid>
