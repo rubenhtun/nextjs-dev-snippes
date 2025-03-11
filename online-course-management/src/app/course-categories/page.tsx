@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CategoryIcon from "@mui/icons-material/Category";
 import Link from "next/link";
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { deleteCourseCategory } from "./action";
 
 export default async function AvailableCourses() {
@@ -39,17 +39,17 @@ export default async function AvailableCourses() {
       </Box>
 
       {/* Course Category Lists */}
-      <Grid container spacing={3} sx={{ mt: 3 }}>
+      <Grid container spacing={2} sx={{ mt: 2 }}>
         {courseCategories.map((courseCategory) => (
-          <Grid item xs={12} sm={6} lg={4} key={courseCategory.id}>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={courseCategory.id}>
             <Paper
               sx={{
-                p: 2,
+                p: 1.5,
                 borderRadius: 2,
-                boxShadow: 3,
+                boxShadow: 2,
                 bgcolor: "#f9f9f9",
                 "&:hover": {
-                  boxShadow: 6,
+                  boxShadow: 4,
                   bgcolor: "#e3f2fd",
                   transition: "all 0.3s",
                 },
@@ -66,46 +66,65 @@ export default async function AvailableCourses() {
                 <IconButton
                   sx={{
                     position: "absolute",
-                    top: 10,
-                    right: 8,
+                    top: 8,
+                    left: 8,
                     color: "#f1f1f1",
+                    "&:hover": {
+                      color: "#ff4444",
+                    },
                   }}
                   type="submit"
                 >
-                  <Delete />
+                  <Delete fontSize="small" />
                 </IconButton>
               </Box>
 
+              {/* Edit icon */}
               <Link
-                href={`course-categories/${courseCategory.id}`}
+                href={`course-categories/${courseCategory.id}/update-course-category`}
                 style={{ textDecoration: "none" }}
               >
-                <Box
+                <IconButton
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: "100%",
-                    height: "150px",
-                    borderRadius: 2,
-                    bgcolor: "#6a1b9a",
-                    color: "#fff",
-                    mb: 2,
+                    position: "absolute",
+                    top: 10,
+                    right: 8,
+                    color: "#f1f1f1",
+                    "&:hover": {
+                      color: "#3f51b5",
+                    },
                   }}
                 >
-                  <CategoryIcon sx={{ fontSize: 80 }} />
-                </Box>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#3f51b5",
-                    textAlign: "center",
-                  }}
-                >
-                  {courseCategory.name}
-                </Typography>
+                  <Edit />
+                </IconButton>
               </Link>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100px",
+                  borderRadius: 2,
+                  bgcolor: "#6a1b9a",
+                  color: "#fff",
+                  mb: 1.5,
+                }}
+              >
+                <CategoryIcon sx={{ fontSize: 50 }} />
+              </Box>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#3f51b5",
+                  textAlign: "center",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {courseCategory.name}
+              </Typography>
             </Paper>
           </Grid>
         ))}

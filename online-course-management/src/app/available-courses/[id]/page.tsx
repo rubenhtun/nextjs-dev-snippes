@@ -1,15 +1,8 @@
 import React from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import Layout from "@/app/components/Layout";
 import { prisma } from "@/libs/prisma";
-import { updateCourse } from "../action";
+
 import Link from "next/link";
 
 interface Props {
@@ -18,7 +11,7 @@ interface Props {
   };
 }
 
-export default async function UpdateCourse({ params }: Props) {
+export default async function SeeCourseInfo({ params }: Props) {
   const { id } = params;
   const courseInfo = await prisma.courses.findUnique({
     where: { id: Number(id) },
@@ -37,8 +30,6 @@ export default async function UpdateCourse({ params }: Props) {
   return (
     <Layout>
       <Box
-        component="form"
-        action={updateCourse}
         sx={{
           width: "100%",
           maxWidth: 600,
@@ -49,88 +40,41 @@ export default async function UpdateCourse({ params }: Props) {
           borderRadius: 2,
         }}
       >
-        <input type="hidden" name="courseId" value={courseInfo.id} />
-
         <Typography
           variant="h5"
           sx={{ color: "#6a1b9a", mb: 3, textAlign: "center" }}
         >
-          Update Course Info
+          Course Info
         </Typography>
 
-        {/* Course Title */}
-        <TextField
-          label="Course Title"
-          name="courseTitle"
-          defaultValue={courseInfo.name}
-          variant="outlined"
-          fullWidth
-          sx={{ mb: 3 }}
-        />
+        <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+          {courseInfo.name}
+        </Typography>
 
-        {/* Course Description */}
-        <TextField
-          label="Course Description"
-          name="courseDescription"
-          defaultValue={courseInfo.description}
-          variant="outlined"
-          multiline
-          rows={4}
-          fullWidth
-          sx={{ mb: 3 }}
-        />
+        <Typography variant="body1" sx={{ mb: 2, textAlign: "center" }}>
+          {courseInfo.description}
+        </Typography>
 
-        {/* Price */}
-        <TextField
-          label="Price"
-          name="price"
-          defaultValue={courseInfo.price}
-          variant="outlined"
-          type="number"
-          fullWidth
-          sx={{ mb: 3 }}
-        />
+        <Typography variant="body1" sx={{ mb: 2, textAlign: "center" }}>
+          Price: {courseInfo.price} Kyats
+        </Typography>
 
-        {/* Is Published */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              defaultChecked={courseInfo.isPublished ? true : false}
-              name="isPublished"
-            />
-          }
-          label="Is Published"
-          sx={{ mb: 3 }}
-        />
+        <Typography variant="body1" sx={{ mb: 2, textAlign: "center" }}>
+          {courseInfo.isPublished ? "Published" : "Not Published"}
+        </Typography>
 
-        {/* Buttons Container */}
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-          {/* Cancle Button */}
-          <Link href={"/available-courses"}>
-            <Button
-              sx={{
-                border: "1px solid #6a1b9a",
-                "&:hover": { border: "1px solid #8e24aa" },
-                py: 1,
-              }}
-            >
-              Cancel
-            </Button>
-          </Link>
-
-          {/* Submit Button */}
+        {/* Close Button */}
+        <Link href={"/available-courses"}>
           <Button
-            variant="contained"
             sx={{
-              bgcolor: "#6a1b9a",
-              "&:hover": { bgcolor: "#8e24aa" },
+              border: "1px solid #6a1b9a",
+              "&:hover": { border: "1px solid #8e24aa" },
               py: 1,
             }}
-            type="submit"
           >
-            Update Course
+            Close
           </Button>
-        </Box>
+        </Link>
       </Box>
     </Layout>
   );

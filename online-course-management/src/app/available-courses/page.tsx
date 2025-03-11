@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import Link from "next/link";
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { deleteCourse } from "./action";
 
 export default async function AvailableCourses() {
@@ -69,21 +69,44 @@ export default async function AvailableCourses() {
                   position: "relative",
                 }}
               >
-                {/* Three dots icon */}
+                {/* Delete icon */}
                 <Box component={"form"} action={deleteCourse}>
                   <input type="hidden" name="courseId" value={course.id} />
                   <IconButton
                     sx={{
                       position: "absolute",
                       top: 10,
-                      right: 8,
+                      left: 8,
                       color: "#f1f1f1",
+                      "&:hover": {
+                        color: "#ff4444",
+                      },
                     }}
                     type="submit"
                   >
                     <Delete />
                   </IconButton>
                 </Box>
+
+                {/* Edit icon */}
+                <Link
+                  href={`available-courses/${course.id}/update-course`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      right: 8,
+                      color: "#f1f1f1",
+                      "&:hover": {
+                        color: "#3f51b5",
+                      },
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Link>
 
                 <Link
                   href={`available-courses/${course.id}`}

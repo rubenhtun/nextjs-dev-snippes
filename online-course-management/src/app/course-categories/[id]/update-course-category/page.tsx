@@ -2,7 +2,7 @@ import React from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import Layout from "@/app/components/Layout";
 import { prisma } from "@/libs/prisma";
-import { updateCourseCategory } from "../action";
+import { updateCourseCategory } from "../../action";
 import Link from "next/link";
 
 interface Props {
@@ -51,7 +51,7 @@ export default async function UpdateCourseCategory({ params }: Props) {
           variant="h5"
           sx={{ color: "#6a1b9a", mb: 3, textAlign: "center" }}
         >
-          Update Course Info
+          Update Course Category Name
         </Typography>
 
         <TextField
