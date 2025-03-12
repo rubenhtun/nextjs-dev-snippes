@@ -17,7 +17,18 @@ export async function addNewCourse(formData: FormData) {
     isPublished: isPublished,
   };
 
-  await prisma.courses.create({ data: courseInfo });
+  const course = await prisma.courses.create({ data: courseInfo });
+
+  const courseCategoryIds = formData
+    .getAll("courseCategory")
+    .map((item) => Number(item));
+
+  const data = courseCategoryIds.map((courseCategoryId) => ({
+    courseId: course.id,
+    courseCategoryId,
+  }));
+
+  await prisma.courseCategoriesCourses.createMany({ data });
 
   // After successful creation
   redirect("/available-courses");
@@ -50,7 +61,9 @@ export async function updateCourse(formData: FormData) {
 // Delete course
 export async function deleteCourse(formData: FormData) {
   const courseId = formData.get("courseId") as string;
-
+  await prisma.courseCategoriesCourses.deleteMany({
+    where: { courseId: Number(courseId) },
+  });
   await prisma.courses.delete({ where: { id: Number(courseId) } });
 
   // After deletion, refresh page again

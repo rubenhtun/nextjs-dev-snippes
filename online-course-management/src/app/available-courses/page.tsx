@@ -16,6 +16,7 @@ import { deleteCourse } from "./action";
 
 export default async function AvailableCourses() {
   const courses = await prisma.courses.findMany();
+
   return (
     <Layout>
       <Box
