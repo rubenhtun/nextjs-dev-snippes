@@ -7,6 +7,9 @@ import { redirect } from "next/navigation";
 export async function addNewCourse(formData: FormData) {
   const courseTitle = formData.get("courseTitle") as string;
   const courseDescription = formData.get("couseDescription") as string;
+  const courseCategoryIds = formData
+    .getAll("courseCategory")
+    .map((item) => Number(item));
   const price = formData.get("price");
   const isPublished = formData.get("isPublished") ? true : false;
 
@@ -19,16 +22,12 @@ export async function addNewCourse(formData: FormData) {
 
   const course = await prisma.courses.create({ data: courseInfo });
 
-  const courseCategoryIds = formData
-    .getAll("courseCategory")
-    .map((item) => Number(item));
-
-  const data = courseCategoryIds.map((courseCategoryId) => ({
+  const categoryInfo = courseCategoryIds.map((courseCategoryId) => ({
     courseId: course.id,
     courseCategoryId,
   }));
 
-  await prisma.courseCategoriesCourses.createMany({ data });
+  await prisma.courseCategoriesCourses.createMany({ data: categoryInfo });
 
   // After successful creation
   redirect("/available-courses");
@@ -39,6 +38,9 @@ export async function updateCourse(formData: FormData) {
   const courseId = formData.get("courseId") as string;
   const courseTitle = formData.get("courseTitle") as string;
   const courseDescription = formData.get("courseDescription") as string;
+  const courseCategoryIds = formData
+    .getAll("courseCategory")
+    .map((item) => Number(item));
   const price = formData.get("price");
   const isPublished = formData.get("isPublished") === "on";
 
@@ -49,10 +51,21 @@ export async function updateCourse(formData: FormData) {
     isPublished: isPublished,
   };
 
-  await prisma.courses.update({
+  const updatedCourse = await prisma.courses.update({
     where: { id: Number(courseId) },
     data: courseInfo,
   });
+
+  await prisma.courseCategoriesCourses.deleteMany({
+    where: { courseId: updatedCourse.id },
+  });
+
+  const categoryInfo = courseCategoryIds.map((courseCategoryId) => ({
+    courseId: updatedCourse.id,
+    courseCategoryId: Number(courseCategoryId),
+  }));
+
+  await prisma.courseCategoriesCourses.createMany({ data: categoryInfo });
 
   // Redirect after successful update
   redirect("/available-courses");

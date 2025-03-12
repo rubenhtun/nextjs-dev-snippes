@@ -22,7 +22,20 @@ export default async function UpdateCourse({ params }: Props) {
   const { id } = params;
   const courseInfo = await prisma.courses.findUnique({
     where: { id: Number(id) },
+    include: {
+      categories: {
+        include: {
+          courseCategory: true,
+        },
+      },
+    },
   });
+
+  const courseCategories = await prisma.courseCategories.findMany();
+
+  const choosenCategories = courseInfo?.categories.map(
+    (category) => category.courseCategoryId
+  );
 
   if (!courseInfo) {
     return (
@@ -79,6 +92,26 @@ export default async function UpdateCourse({ params }: Props) {
           fullWidth
           sx={{ mb: 3 }}
         />
+
+        {/* Course Categories List */}
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
+          {courseCategories.map((courseCategory) => (
+            <FormControlLabel
+              key={courseCategory.id}
+              control={
+                <Checkbox
+                  name="courseCategory"
+                  value={courseCategory.id}
+                  defaultChecked={choosenCategories?.includes(
+                    courseCategory.id
+                  )}
+                />
+              }
+              label={courseCategory.name}
+              sx={{ mb: 0 }}
+            />
+          ))}
+        </Box>
 
         {/* Price */}
         <TextField
